@@ -1,0 +1,4 @@
+name: KitPreview
+version: '1.0-SNAPSHOT'
+main: dev.iidanto.kitPreview.KitPreview
+api-version: '1.21'
