@@ -11,6 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+
+// The Code just looks ugly tbh
 public class KitRoomMenu extends InventoryBuilder {
     private final Player player;
     private final KitRoomManager kitRoomManager;
