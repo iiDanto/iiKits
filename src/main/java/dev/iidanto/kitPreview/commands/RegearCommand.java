@@ -8,6 +8,12 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
+/*
+
+Overcompilcated.
+
+ */
+
 public class RegearCommand extends CommandAPICommand {
     private final KitPreview main;
     private final FileConfiguration config;

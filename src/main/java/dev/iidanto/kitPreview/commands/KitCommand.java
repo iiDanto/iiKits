@@ -5,11 +5,13 @@ import dev.iidanto.kitPreview.cache.KitCache;
 import dev.iidanto.kitPreview.menus.KitDisplayMenu;
 import dev.iidanto.kitPreview.menus.KitMenu;
 import dev.iidanto.kitPreview.menus.KitRoomMenu;
-import dev.iidanto.kitPreview.models.Kit;
+import dev.iidanto.kitPreview.objects.Kit;
+import dev.iidanto.kitPreview.objects.KitHolder;
 import dev.iidanto.kitPreview.storage.DatabaseManager;
 import dev.iidanto.kitPreview.utils.ColorUtils;
 import dev.iidanto.kitPreview.utils.PlayerUtils;
 import dev.jorel.commandapi.CommandAPICommand;
+import dev.jorel.commandapi.CommandTree;
 import dev.jorel.commandapi.arguments.IntegerArgument;
 import dev.jorel.commandapi.arguments.OfflinePlayerArgument;
 import org.bukkit.Bukkit;
@@ -21,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class KitCommand extends CommandAPICommand {
     private final KitPreview main = KitPreview.getInstance();
@@ -37,42 +40,52 @@ public class KitCommand extends CommandAPICommand {
                 .withPermission("vanillacore.kits.view")
                 .withArguments(new OfflinePlayerArgument("player"), new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
-                    OfflinePlayer target = (OfflinePlayer) args.get("player");
-                    int kitint = (int) args.get("kit");
-                    Kit kit = KitCache.getAllKits(target.getUniqueId()).get(kitint);
-                    if (kit == null){
-                        DatabaseManager.getInstance().getKitDatabase().loadKits(target.getUniqueId());
-                        kit = KitCache.getAllKits(target.getUniqueId()).get(kitint);
-                        if (kit == null || kit.getContent().isEmpty()){
-                            player.sendActionBar(ColorUtils.parse("<red>✗ Kit #%id% does not exist.".replace("%id%", Integer.toString(kitint))));
-                            player.playSound(player, Sound.ENTITY_VILLAGER_NO, 1.0f, 1.0f);
-                            return;
-                        }
+                    final OfflinePlayer target = (OfflinePlayer) args.get("player");
+                    final int kitID = (int) args.get("kit");
+
+
+                    // KitCache thing is bad practice. Not going to fix it though <3
+                    final KitHolder holder = KitCache.get(target.getUniqueId());
+                    final AtomicReference kitRef = new AtomicReference(holder);
+
+                    if (kitRef.get() == null) {
+                        DatabaseManager.getInstance().get(KitHolder.class, target.getUniqueId()).thenAccept(kitHolder -> {
+                            if (kitHolder.isPresent()) {
+                                kitRef.set(kitHolder.get());
+                            } else {
+                                kitRef.set(KitHolder.newEmpty(target.getUniqueId()));
+                            }
+                        });
                     }
+
+                    final KitHolder updatedHolder = (KitHolder) kitRef.get();
+                    final Kit kit = updatedHolder.getList().get(kitID);
+
                     new KitDisplayMenu(player, kit, false, true).open(player);
                 }));
         this.withSubcommand(new CommandAPICommand("preview")
                 .withPermission("vanillacore.kits.preview")
                 .withArguments(new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
-                    new KitDisplayMenu(player, KitCache.getAllKits(player.getUniqueId()).get(args.get("kit")), false, false).open(player);
+                    new KitDisplayMenu(player, KitCache.getAll(player.getUniqueId()).get(args.get("kit")), false, false).open(player);
                     player.playSound(player, Sound.ENTITY_CHICKEN_EGG, 1.0F, 5.0f);
                 }));
         this.withSubcommand(new CommandAPICommand("save")
-                .withPermission("vanillacore.kits.save")
+                .withPermission("vanillacore.kits.save") // Why would you need permissions for stuff like this?
                 .withArguments(new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
                     int kit = (int) args.get("kit");
                     Map<Integer, ItemStack> items = new HashMap<>();
 
+
                     for (int i = 0; i < player.getInventory().getSize(); i++) {
                         ItemStack item = player.getInventory().getItem(i);
-                        if (item != null && item.getType() != Material.AIR) {
+                        if (item != null && item.getType() != Material.AIR) { // There is no issue with saving air. It's easier too, as you can just do getInventory#getContents();
                             items.put(i, item.clone());
                         }
                     }
 
-                    KitCache.putKit(player.getUniqueId(), new Kit(player.getUniqueId(), kit, items));
+                    KitCache.put(player.getUniqueId(), new Kit(player.getUniqueId(), kit, items));
                     player.sendMessage(ColorUtils.parse(prefix + "<gray>Successfully saved " + colour + "Kit <int>".replace("<int>", String.valueOf(kit))));
                 })
         );
@@ -82,7 +95,7 @@ public class KitCommand extends CommandAPICommand {
                 .withArguments(new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
                     int kitnum = (int) args.get("kit");
-                    Kit kit = KitCache.getAllKits(player.getUniqueId()).get(kitnum);
+                    Kit kit = KitCache.getAll(player.getUniqueId()).get(kitnum);
 
                     if (kit == null || kit.getContent().isEmpty()) {
                         player.sendMessage(ColorUtils.parse(prefix + "<red>That kit does not exist or is empty."));
@@ -103,13 +116,13 @@ public class KitCommand extends CommandAPICommand {
                     player.setFoodLevel(20);
                     player.setSaturation(20);
 
-                    KitPreview.getLastLoadedKit().put(player.getUniqueId(), kit);
+                    KitPreview.getInstance().getLastLoadedKit().put(player.getUniqueId(), kit);
                     player.sendMessage(ColorUtils.parse(prefix + "<gray>You have successfully loaded " + colour + "Kit <int>".replace("<int>", String.valueOf(kitnum))));
                     if (config.getBoolean("general.rekits.announce-rekits")) {
                         int distance = config.getInt("general.rekits.distance");
                         if (distance == 0) {
-                            Bukkit.getOnlinePlayers().forEach(p ->
-                                    p.sendMessage(ColorUtils.parse(prefix + colour + player.getName() + " <gray>Has Loaded A Kit!"))
+                            Bukkit.getOnlinePlayers().forEach(player1 ->
+                                    player1.sendMessage(ColorUtils.parse(prefix + colour + player.getName() + " <gray>Has Loaded A Kit!"))
                             );
                         } else {
                             PlayerUtils.getPlayersInDistance(player.getLocation(), distance).forEach(p ->
@@ -127,5 +140,42 @@ public class KitCommand extends CommandAPICommand {
                 }));
 
         this.register();
+    }
+
+    // I didnt know what to call this method so I went with setup(). You should rather do this where you
+    // register all your commands.
+    public static void setup() {
+        for (int i = 0; i < 9; i++) {
+            final int j = i;
+            new CommandTree("k" + i)
+                    .executesPlayer((player, args) -> {
+                        Kit kit = KitCache.getAll(player.getUniqueId()).get(j);
+                        player.getInventory().clear();
+                        for (Map.Entry<Integer, ItemStack> entry : kit.getContent().entrySet()) {
+                            int slot = entry.getKey();
+                            ItemStack item = entry.getValue();
+                            if (slot >= 0 && slot < player.getInventory().getSize()) {
+                                player.getInventory().setItem(slot, item == null ? new ItemStack(Material.AIR) : item);
+                            }
+                        }
+                        player.setFoodLevel(20);
+                        player.setSaturation(20);
+                        player.sendMessage(ColorUtils.parse(prefix + "<gray>You have successfully loaded " + colour + "Kit " + j));
+                        KitPreview.getInstance().getLastLoadedKit().put(player.getUniqueId(), kit);
+
+                        // Bad practice + boilerplate (Not going to fix though)
+                        if (config.getBoolean("general.rekits.announce-rekits")){
+                            if (config.getInt("general.rekits.distance") == 0){
+                                Bukkit.getOnlinePlayers().forEach(player1 -> {
+                                    player1.sendMessage(ColorUtils.parse(prefix + colour + "<player> <gray>Has Loaded A Kit!".replace("<player>", player1.getName())));
+                                });
+                            } else {
+                                PlayerUtils.getPlayersInDistance(player.getLocation(), config.getInt("general.rekits.distance")).forEach(player1 -> {
+                                    player1.sendMessage(ColorUtils.parse(prefix + colour + "<player> <gray>Has Loaded A Kit!".replace("<player>", player1.getName())));
+                                });
+                            }
+                        }
+                    });
+        }
     }
 }

@@ -3,7 +3,7 @@ package dev.iidanto.kitPreview.menus;
 import dev.iidanto.kitPreview.KitPreview;
 import dev.iidanto.kitPreview.cache.KitCache;
 import dev.iidanto.kitPreview.manager.KitRoomManager;
-import dev.iidanto.kitPreview.models.Kit;
+import dev.iidanto.kitPreview.objects.Kit;
 import dev.iidanto.kitPreview.utils.ColorUtils;
 import dev.iidanto.kitPreview.utils.InventoryBuilder;
 import dev.iidanto.kitPreview.utils.ItemBuilder;
@@ -39,7 +39,7 @@ public class KitMenu extends InventoryBuilder {
                     )
                     .build(), event -> {
                 event.setCancelled(true);
-                Kit kit = KitCache.getAllKits(player.getUniqueId()).get(id);
+                Kit kit = KitCache.getAll(player.getUniqueId()).get(id);
                 if (kit != null) {
                     new KitDisplayMenu(player, kit, true, false).open(player);
                 } else {

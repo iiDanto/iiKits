@@ -1,4 +1,4 @@
-package dev.iidanto.kitPreview.models;
+package dev.iidanto.kitPreview.objects;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,8 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/*
+
+Rather use records. They are literally the same and cleaner.
+
+ */
+
 @RequiredArgsConstructor @Getter
-public class  KitHolder {
+public class KitHolder {
 
     private final UUID uuid;
     private final Map<Integer, Kit> list;

@@ -26,6 +26,7 @@ public class KitRoomManager {
         }
     }
 
+
     public void saveKitRoomInventory(Inventory inventory) {
         Map<Integer, ItemStack> itemsToSave = new HashMap<>();
         for (int slot = 0; slot < 45; slot++) {
@@ -45,6 +46,8 @@ public class KitRoomManager {
         }
     }
 
+    // Don't return a damn inventory. Just load the page as a Map<Integer, ItemStack> or as it's own object and create a new KitRoom Inventory every time
+    // it's opened. Creating and inventory like this is dumb overhead.
     public Inventory loadKitRoomInventory() {
         Inventory inventory = Bukkit.createInventory(null, 54, "Kit Room");
         if (!dataFile.exists()) {

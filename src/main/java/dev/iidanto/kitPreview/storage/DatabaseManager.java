@@ -1,63 +1,78 @@
 package dev.iidanto.kitPreview.storage;
 
-import dev.iidanto.kitPreview.models.Kit;
+import dev.iidanto.kitPreview.KitPreview;
+import dev.iidanto.kitPreview.objects.KitHolder;
 
-import java.util.concurrent.CompletableFuture;
+import java.io.File;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public final class DatabaseManager {
 
     private static DatabaseManager manager;
-    private boolean isConnected = false;
-    private KitDatabase kitDatabase;
+    private final Connection connection;
 
-    public DatabaseManager() {
+    private boolean isConnected = false;
+
+    private Map<Class<?>, DatabaseProvider<?>> providers = new HashMap<>();
+
+    public DatabaseManager(String path) {
         manager = this;
-        try {
-            kitDatabase = new KitDatabase();
-            isConnected = true;
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to initialize KitDatabase!", e);
+        File file = new File(path);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+
         }
+        try {
+            this.connection = DriverManager.getConnection("jdbc:sqlite:" + path);
+            isConnected = true;
+            register();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        for(DatabaseProvider<?> provider : providers.values()) {
+            provider.start();
+        }
+    }
+
+    public <T>CompletableFuture<Optional<T>> get(Class<T> clazz, UUID uuid) {
+        if(!isConnected) {
+            return CompletableFuture.completedFuture(Optional.empty());
+        }
+        return CompletableFuture.supplyAsync(() -> (Optional<T>) providers.get(clazz).get(uuid));
+    }
+
+    public <T>CompletableFuture<Void> save(Class<T> clazz, T t) {
+        if(!isConnected) {
+            return CompletableFuture.completedFuture(null);
+        }
+        return CompletableFuture.supplyAsync(() -> {
+            ((DatabaseProvider<T>) providers.get(clazz)).save(t);
+            return null;
+        });
+    }
+
+    private void register() {
+        providers.put(KitHolder.class, new KitDatabase(connection));
     }
 
     public static DatabaseManager getInstance() {
         if (manager == null) {
-            synchronized (DatabaseManager.class) {
-                if (manager == null) {
-                    manager = new DatabaseManager();
-                }
-            }
+            new DatabaseManager(KitPreview.getInstance().getDataFolder().getAbsolutePath() + "/kits.db");
+            return manager;
         }
         return manager;
-    }
-
-    public boolean isConnected() {
-        return isConnected;
-    }
-
-    public KitDatabase getKitDatabase() {
-        return kitDatabase;
-    }
-
-    public CompletableFuture<Void> saveKitAsync(Kit kit) {
-        if (!isConnected) return CompletableFuture.completedFuture(null);
-        return CompletableFuture.runAsync(() -> kitDatabase.saveKit(kit));
-    }
-
-    public CompletableFuture<Void> deleteKitAsync(UUID uuid, int kitId) {
-        if (!isConnected) return CompletableFuture.completedFuture(null);
-        return CompletableFuture.runAsync(() -> kitDatabase.deleteKit(uuid, kitId));
-    }
-
-    public void close() {
-        if (kitDatabase != null) {
-            try {
-                kitDatabase.closeConnection();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        isConnected = false;
     }
 }

@@ -2,7 +2,7 @@ package dev.iidanto.kitPreview.menus;
 
 import dev.iidanto.kitPreview.KitPreview;
 import dev.iidanto.kitPreview.cache.KitCache;
-import dev.iidanto.kitPreview.models.Kit;
+import dev.iidanto.kitPreview.objects.Kit;
 import dev.iidanto.kitPreview.utils.ColorUtils;
 import dev.iidanto.kitPreview.utils.InventoryBuilder;
 import dev.iidanto.kitPreview.utils.ItemBuilder;
@@ -14,12 +14,20 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+
+Way too big. This is easier and better to code than this.
+
+ */
+
 public class KitDisplayMenu extends InventoryBuilder {
-    String colour = KitPreview.getInstance().getConfig().getString("messages.colour");
 
     public KitDisplayMenu(Player player, Kit kit, boolean isFromKitMenu, boolean viewMenu){
         super(54, "<#28a8ff>Kit Display Menu - Kit #" + kit.getID());
         getInventory().clear();
+
+        String colour = KitPreview.getInstance().getConfig().getString("messages.colour");
+
         Map<Integer, ItemStack> items = kit.getContent();
         for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
             int slot = entry.getKey();
@@ -50,7 +58,7 @@ public class KitDisplayMenu extends InventoryBuilder {
                 }
 
                 kit.setContent(itemstacks);
-                KitCache.putKit(player.getUniqueId(), kit);
+                KitCache.put(player.getUniqueId(), kit);
                 player.closeInventory();
                 player.sendActionBar(ColorUtils.parse("<green>✔ Successfully Saved Kit #" + kit.getID()));
             });

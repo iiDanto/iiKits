@@ -1,12 +1,12 @@
 package dev.iidanto.kitPreview.storage;
 
-import dev.iidanto.kitPreview.models.KitHolder;
-
 import java.util.Optional;
+import java.util.UUID;
 
 public interface DatabaseProvider<T> {
 
     void start();
     void save(T t);
-    Optional<KitHolder> get(String id);
+    Optional<T> get(UUID id);
+
 }
