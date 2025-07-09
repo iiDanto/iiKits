@@ -2,6 +2,7 @@ package dev.iidanto.kitPreview.commands;
 
 import dev.iidanto.kitPreview.KitPreview;
 import dev.iidanto.kitPreview.cache.KitCache;
+import dev.iidanto.kitPreview.events.KitLoadEvent;
 import dev.iidanto.kitPreview.menus.KitDisplayMenu;
 import dev.iidanto.kitPreview.menus.KitMenu;
 import dev.iidanto.kitPreview.menus.KitRoomMenu;
@@ -111,6 +112,7 @@ public class KitCommand extends CommandAPICommand {
                             player.getInventory().setItem(slot, item == null ? new ItemStack(Material.AIR) : item);
                         }
                     }
+                    Bukkit.getServer().getPluginManager().callEvent(new KitLoadEvent(kit));
 
                     player.setFoodLevel(20);
                     player.setSaturation(20);
@@ -155,6 +157,8 @@ public class KitCommand extends CommandAPICommand {
                                 player.getInventory().setItem(slot, item == null ? new ItemStack(Material.AIR) : item);
                             }
                         }
+                        Bukkit.getServer().getPluginManager().callEvent(new KitLoadEvent(kit));
+
                         player.setFoodLevel(20);
                         player.setSaturation(20);
                         player.sendMessage(ColorUtils.parse(prefix + "<gray>You have successfully loaded " + colour + "Kit " + j));

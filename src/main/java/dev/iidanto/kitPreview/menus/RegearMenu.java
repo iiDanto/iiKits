@@ -1,14 +1,12 @@
 package dev.iidanto.kitPreview.menus;
 
 import dev.iidanto.kitPreview.KitPreview;
+import dev.iidanto.kitPreview.events.RegearEvent;
 import dev.iidanto.kitPreview.objects.Kit;
 import dev.iidanto.kitPreview.utils.ColorUtils;
 import dev.iidanto.kitPreview.utils.InventoryBuilder;
 import dev.iidanto.kitPreview.utils.ItemBuilder;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -37,8 +35,8 @@ public class RegearMenu extends InventoryBuilder {
                         return;
                     }
 
-                    List<String> whitelistStrings = KitPreview.getInstance().getConfig().getStringList("whitelist");
-                    Set<Material> whitelist = whitelistStrings.stream()
+                    List<String> wlStr = KitPreview.getInstance().getConfig().getStringList("whitelist");
+                    Set<Material> wl = wlStr.stream()
                             .map(name -> {
                                 try {
                                     return Material.valueOf(name);
@@ -53,7 +51,7 @@ public class RegearMenu extends InventoryBuilder {
                 int slot = entry.getKey();
                 ItemStack kititem = entry.getValue();
 
-                if (kititem == null || !whitelist.contains(kititem.getType())) {
+                if (kititem == null || !wl.contains(kititem.getType())) {
                     continue;
                 }
 
@@ -75,6 +73,7 @@ public class RegearMenu extends InventoryBuilder {
 
             player.playSound(player, Sound.ENTITY_CHICKEN_EGG, 1.0f, 5.0f);
             player.sendActionBar(ColorUtils.parse(colour + "<green>✔ Regear complete!"));
+            Bukkit.getServer().getPluginManager().callEvent(new RegearEvent(kit));
         }
         );
     }
