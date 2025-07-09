@@ -30,6 +30,7 @@ public final class KitPreview extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+        saveDefaultConfig();
         new KitCommand().setup();
         new KitCommand().register();
         new RegearCommand();

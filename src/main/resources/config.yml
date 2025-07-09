@@ -4,6 +4,12 @@
 # Discord: iiDanto - iidanto
 # Minecraft: iiDanto
 
+storage:
+  type: "SQLite" # Options: SQLite, MySQL
+  credentials:
+    url: ""
+    username: ""
+    password: ""
 general:
   rekits:
     announce-rekits: true
