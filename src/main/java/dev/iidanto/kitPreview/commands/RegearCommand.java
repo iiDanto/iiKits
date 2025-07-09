@@ -21,7 +21,7 @@ public class RegearCommand extends CommandAPICommand {
         prefix = config.getString("messages.prefix");
         colour = config.getString("messages.colour");
         this.withAliases("rg");
-        this.withPermission("vanillacore.regear");
+        this.withPermission("iikits.regear");
         this.executesPlayer((player, args) -> {
             ItemStack rgshulk = new ItemBuilder(Material.SHULKER_BOX)
                     .name(colour + "ʀᴇɢᴇᴀʀ ꜱʜᴜʟᴋᴇʀ")

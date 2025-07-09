@@ -11,8 +11,6 @@ general:
 messages:
   prefix: "<gray>[<#28a8ff><bold>V<white><bold>C<gray>] <#28a8ff>» "
   colour: "<#28a8ff>" # Ensure you put the HEX Colour Code inside brackets (<>)!
-terrain-generation:
-  maximum-hill-height: 4
 whitelist: # ALl items that will be given to a player upon regear.
   - ENDER_PEARL
   - END_CRYSTAL
