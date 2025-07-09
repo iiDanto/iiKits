@@ -4,7 +4,7 @@
 
 ![GitHub release](https://img.shields.io/github/v/release/iiDanto/iiKits)
 ![Bukkit](https://img.shields.io/badge/Bukkit-1.8--1.20-yellow)
-![License](https://img.shields.io/github/license/iiDanto/iiKits)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ---
 
