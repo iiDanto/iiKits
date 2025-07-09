@@ -2,7 +2,7 @@
 
 **iiKits** is a modern, lightweight Minecraft plugin that lets you create, customize, and manage kits for your server with ease. Built for flexibility and performance, iiKits is perfect for PvP, Factions, Survival, or any server that needs reliable kit functionality.
 
-![GitHub release](https://img.shields.io/github/v/release/yourusername/iiKits)
+![GitHub release](https://img.shields.io/github/v/release/iiDanto/iiKits)
 ![Bukkit](https://img.shields.io/badge/Bukkit-1.8--1.20-yellow)
 ![License](https://img.shields.io/github/license/iiDanto/iiKits)
 
