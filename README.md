@@ -57,7 +57,6 @@
 | `iikits.kits.save`        | Allows players to save their current inventory as a kit |
 | `iikits.kits.load`        | Allows players to load a kit into their inventory |
 | `iikits.kitroom`          | Allows players to open the kit room GUI        |
-| `iikits.kit.<kitname>`    | Grants access to specific kits (if permission-restricted) |
 | `iikits.admin`            | (Optional) Full access to all kit commands     |
 
 ---
