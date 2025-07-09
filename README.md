@@ -45,7 +45,6 @@
 | `/kit save <name>`    | Save a new kit from inventory |
 | `/kit load <name>`    | Loads a kit                   |
 | `/k<int>`             | Quick Loads a Kit             |
-| `/k<int>`             | Quick Loads a Kit             |
 
 ### Permissions
 
@@ -81,6 +80,12 @@ iiKits is fully configurable via the `config.yml` file. You can define:
 # Discord: iiDanto - iidanto
 # Minecraft: iiDanto
 
+storage:
+  type: "SQLite" # Options: SQLite, MySQL
+  credentials:
+    url: ""
+    username: ""
+    password: ""
 general:
   rekits:
     announce-rekits: true
