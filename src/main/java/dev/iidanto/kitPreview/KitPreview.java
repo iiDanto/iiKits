@@ -3,7 +3,6 @@ package dev.iidanto.kitPreview;
 import dev.iidanto.kitPreview.commands.KitCommand;
 import dev.iidanto.kitPreview.commands.RegearCommand;
 import dev.iidanto.kitPreview.listeners.ConnectionListener;
-import dev.iidanto.kitPreview.listeners.ConnectionMessageListener;
 import dev.iidanto.kitPreview.objects.Kit;
 import dev.iidanto.kitPreview.storage.DatabaseManager;
 import dev.iidanto.kitPreview.utils.InventoryManager;
