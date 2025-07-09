@@ -14,7 +14,7 @@
 - ⏳ Async Kit Saving & Loading
 - 🔒 Permission based administration panel
 - 🔄 Kit previews and item replacements  
-- 💾 SQLite Storage
+- 💾 Configurable Storage (SQLite / MySQL)
 
 ---
 
