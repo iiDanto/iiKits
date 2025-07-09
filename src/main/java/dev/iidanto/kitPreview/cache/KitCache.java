@@ -10,14 +10,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-/*
-
-Do I even need to say anything about this class? Probably not, but I will.
-This KitCache thing is okay, methods like getAll are useless because you
-can just add a #get() method and return the KitHolder.
-
- */
-
 @UtilityClass
 public class KitCache {
     private final Map<UUID, KitHolder> kits = new ConcurrentHashMap<>();

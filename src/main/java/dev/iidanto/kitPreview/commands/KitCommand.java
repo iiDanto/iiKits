@@ -37,14 +37,12 @@ public class KitCommand extends CommandAPICommand {
             new KitMenu(player).open(player);
         });
         this.withSubcommand(new CommandAPICommand("view")
-                .withPermission("vanillacore.kits.view")
+                .withPermission("iikits.kits.view")
                 .withArguments(new OfflinePlayerArgument("player"), new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
                     final OfflinePlayer target = (OfflinePlayer) args.get("player");
                     final int kitID = (int) args.get("kit");
 
-
-                    // KitCache thing is bad practice. Not going to fix it though <3
                     final KitHolder holder = KitCache.get(target.getUniqueId());
                     final AtomicReference kitRef = new AtomicReference(holder);
 
@@ -64,14 +62,14 @@ public class KitCommand extends CommandAPICommand {
                     new KitDisplayMenu(player, kit, false, true).open(player);
                 }));
         this.withSubcommand(new CommandAPICommand("preview")
-                .withPermission("vanillacore.kits.preview")
+                .withPermission("iikits.kits.preview")
                 .withArguments(new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
                     new KitDisplayMenu(player, KitCache.getAll(player.getUniqueId()).get(args.get("kit")), false, false).open(player);
                     player.playSound(player, Sound.ENTITY_CHICKEN_EGG, 1.0F, 5.0f);
                 }));
         this.withSubcommand(new CommandAPICommand("save")
-                .withPermission("vanillacore.kits.save") // Why would you need permissions for stuff like this?
+                .withPermission("iikits.kits.save")
                 .withArguments(new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
                     int kit = (int) args.get("kit");
@@ -80,18 +78,20 @@ public class KitCommand extends CommandAPICommand {
 
                     for (int i = 0; i < player.getInventory().getSize(); i++) {
                         ItemStack item = player.getInventory().getItem(i);
-                        if (item != null && item.getType() != Material.AIR) { // There is no issue with saving air. It's easier too, as you can just do getInventory#getContents();
+                        if (item != null && item.getType() != Material.AIR) {
                             items.put(i, item.clone());
                         }
                     }
 
-                    KitCache.put(player.getUniqueId(), new Kit(player.getUniqueId(), kit, items));
+                    Map<Integer, Kit> kitMap = KitCache.getAll(player.getUniqueId());
+                    kitMap.put(kit, new Kit(player.getUniqueId(), kit, items));
+                    KitCache.put(player.getUniqueId(), new KitHolder(player.getUniqueId(), kitMap));
                     player.sendMessage(ColorUtils.parse(prefix + "<gray>Successfully saved " + colour + "Kit <int>".replace("<int>", String.valueOf(kit))));
                 })
         );
 
         this.withSubcommand(new CommandAPICommand("load")
-                .withPermission("vanillacore.kits.load")
+                .withPermission("iikits.kits.load")
                 .withArguments(new IntegerArgument("kit", 1, 9))
                 .executesPlayer((player, args) -> {
                     int kitnum = (int) args.get("kit");
@@ -103,7 +103,6 @@ public class KitCommand extends CommandAPICommand {
                     }
 
                     player.getInventory().clear();
-                    System.out.println("Loading kit " + kitnum + ": " + kit.getContent());
 
                     for (Map.Entry<Integer, ItemStack> entry : kit.getContent().entrySet()) {
                         int slot = entry.getKey();
@@ -134,7 +133,7 @@ public class KitCommand extends CommandAPICommand {
         );
 
         this.withSubcommand(new CommandAPICommand("room")
-                .withPermission("vanillacore.kitroom")
+                .withPermission("iikits.kitroom")
                 .executesPlayer((player, args) -> {
                     new KitRoomMenu(player, false).open(player);
                 }));
@@ -142,9 +141,7 @@ public class KitCommand extends CommandAPICommand {
         this.register();
     }
 
-    // I didnt know what to call this method so I went with setup(). You should rather do this where you
-    // register all your commands.
-    public static void setup() {
+    public void setup() {
         for (int i = 0; i < 9; i++) {
             final int j = i;
             new CommandTree("k" + i)
@@ -163,7 +160,6 @@ public class KitCommand extends CommandAPICommand {
                         player.sendMessage(ColorUtils.parse(prefix + "<gray>You have successfully loaded " + colour + "Kit " + j));
                         KitPreview.getInstance().getLastLoadedKit().put(player.getUniqueId(), kit);
 
-                        // Bad practice + boilerplate (Not going to fix though)
                         if (config.getBoolean("general.rekits.announce-rekits")){
                             if (config.getInt("general.rekits.distance") == 0){
                                 Bukkit.getOnlinePlayers().forEach(player1 -> {

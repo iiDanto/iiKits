@@ -7,9 +7,7 @@ import dev.iidanto.kitPreview.storage.DatabaseManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class ConnectionMessageListener implements Listener {

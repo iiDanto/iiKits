@@ -9,12 +9,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-/*
-
-Name of this class does not explain what it does... Like what are ParseUtils? You can parse everything to everything. Like what?
-
- */
-public class ParseUtils {
+public class SerializeUtils {
     public static String serializeKitItems(Map<Integer, ItemStack> itemStacks) {
         List<String> serializedItems = new ArrayList<>();
         for (Map.Entry<Integer, ItemStack> entry : itemStacks.entrySet()) {

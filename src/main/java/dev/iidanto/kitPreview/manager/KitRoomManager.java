@@ -3,7 +3,7 @@ package dev.iidanto.kitPreview.manager;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.iidanto.kitPreview.KitPreview;
-import dev.iidanto.kitPreview.utils.ParseUtils;
+import dev.iidanto.kitPreview.utils.SerializeUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -35,7 +35,7 @@ public class KitRoomManager {
                 itemsToSave.put(slot, item);
             }
         }
-        String serialized = ParseUtils.serializeKitItems(itemsToSave);
+        String serialized = SerializeUtils.serializeKitItems(itemsToSave);
         try (FileWriter writer = new FileWriter(dataFile)) {
             JsonObject obj = new JsonObject();
             obj.addProperty("kit", serialized);
@@ -46,8 +46,6 @@ public class KitRoomManager {
         }
     }
 
-    // Don't return a damn inventory. Just load the page as a Map<Integer, ItemStack> or as it's own object and create a new KitRoom Inventory every time
-    // it's opened. Creating and inventory like this is dumb overhead.
     public Inventory loadKitRoomInventory() {
         Inventory inventory = Bukkit.createInventory(null, 54, "Kit Room");
         if (!dataFile.exists()) {
@@ -57,7 +55,7 @@ public class KitRoomManager {
             JsonObject obj = gson.fromJson(reader, JsonObject.class);
             if (obj.has("kit")) {
                 String serialized = obj.get("kit").getAsString();
-                Map<Integer, ItemStack> items = ParseUtils.deserializeItemStackMap(serialized);
+                Map<Integer, ItemStack> items = SerializeUtils.deserializeItemStackMap(serialized);
 
                 for (Map.Entry<Integer, ItemStack> entry : items.entrySet()) {
                     if (entry.getKey() >= 0 && entry.getKey() < 45) {

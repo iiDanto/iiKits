@@ -3,6 +3,7 @@ package dev.iidanto.kitPreview.menus;
 import dev.iidanto.kitPreview.KitPreview;
 import dev.iidanto.kitPreview.cache.KitCache;
 import dev.iidanto.kitPreview.objects.Kit;
+import dev.iidanto.kitPreview.objects.KitHolder;
 import dev.iidanto.kitPreview.utils.ColorUtils;
 import dev.iidanto.kitPreview.utils.InventoryBuilder;
 import dev.iidanto.kitPreview.utils.ItemBuilder;
@@ -13,12 +14,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
-
-/*
-
-Way too big. This is easier and better to code than this.
-
- */
 
 public class KitDisplayMenu extends InventoryBuilder {
 
@@ -38,6 +33,7 @@ public class KitDisplayMenu extends InventoryBuilder {
         }
         this.setViewOnly(true);
         if (!viewMenu){
+            this.setViewOnly(false);
             this.setItem(51, new ItemBuilder(Material.GREEN_CONCRETE)
                     .name(colour + "Save Kit")
                     .glow()
@@ -58,7 +54,11 @@ public class KitDisplayMenu extends InventoryBuilder {
                 }
 
                 kit.setContent(itemstacks);
-                KitCache.put(player.getUniqueId(), kit);
+
+                KitHolder holder = KitCache.get(player.getUniqueId());
+                holder.getList().put(kit.getID(), kit);
+
+                KitCache.put(player.getUniqueId(), holder);
                 player.closeInventory();
                 player.sendActionBar(ColorUtils.parse("<green>✔ Successfully Saved Kit #" + kit.getID()));
             });

@@ -7,12 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/*
-
-Rather use records. They are literally the same and cleaner.
-
- */
-
 @RequiredArgsConstructor @Getter
 public class KitHolder {
 

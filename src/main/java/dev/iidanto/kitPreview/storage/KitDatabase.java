@@ -3,16 +3,12 @@ package dev.iidanto.kitPreview.storage;
 
 import dev.iidanto.kitPreview.objects.Kit;
 import dev.iidanto.kitPreview.objects.KitHolder;
-import dev.iidanto.kitPreview.utils.ParseUtils;
+import dev.iidanto.kitPreview.utils.SerializeUtils;
 
 import java.sql.*;
 import java.util.*;
 
-/*
 
-Fucking up yyuh's DB stuff like this is some deep shit
-
- */
 public class KitDatabase implements DatabaseProvider<KitHolder> {
 
     private final Connection connection;
@@ -50,7 +46,7 @@ public class KitDatabase implements DatabaseProvider<KitHolder> {
                 int kitId = rs.getInt("kit_id");
                 String itemsSerialized = rs.getString("items");
 
-                Map<Integer, org.bukkit.inventory.ItemStack> items = ParseUtils.deserializeItemStackMap(itemsSerialized);
+                Map<Integer, org.bukkit.inventory.ItemStack> items = SerializeUtils.deserializeItemStackMap(itemsSerialized);
                 kits.put(kitId, new Kit(id, kitId, items));
             }
             for (int i = 1; i <= 9; i++) {
@@ -76,7 +72,7 @@ public class KitDatabase implements DatabaseProvider<KitHolder> {
             """)) {
                 statement.setString(1, kit.getOwner().toString());
                 statement.setInt(2, kit.getID());
-                statement.setString(3, ParseUtils.serializeKitItems(kit.getContent()));
+                statement.setString(3, SerializeUtils.serializeKitItems(kit.getContent()));
                 statement.executeUpdate();
             } catch (SQLException e) {
                 e.printStackTrace();

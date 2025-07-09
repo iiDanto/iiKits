@@ -1,0 +1,31 @@
+# iiKits General Configuration
+# Credits:
+# Github: iiDanto
+# Discord: iiDanto - iidanto
+# Minecraft: iiDanto
+
+general:
+  rekits:
+    announce-rekits: true
+    distance: 30
+messages:
+  prefix: "<gray>[<#28a8ff><bold>V<white><bold>C<gray>] <#28a8ff>» "
+  colour: "<#28a8ff>" # Ensure you put the HEX Colour Code inside brackets (<>)!
+terrain-generation:
+  maximum-hill-height: 4
+whitelist: # ALl items that will be given to a player upon regear.
+  - ENDER_PEARL
+  - END_CRYSTAL
+  - OBSIDIAN
+  - GLOWSTONE
+  - SPLASH_POTION
+  - NETHERITE_PICKAXE
+  - NETHERITE_SWORD
+  - SHIELD
+  - NETHERITE_AXE
+  - NETHERITE_PICKAXE
+  - GOLDEN_APPLE
+  - EXPERIENCE_BOTTLE
+  - TIPPED_ARROW
+  - CROSSBOW
+  - BOW
